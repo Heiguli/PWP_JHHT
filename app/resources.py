@@ -169,3 +169,94 @@ class TrackItem(Resource):
         db.session.commit()
         return {"message": f"Track {track.name} deleted successfully"}, 200
     
+class AlbumCollection(Resource):
+
+    def get(self):
+        response_data = []
+        albums = Album.query.all()
+        for album in albums:
+            data = {
+                "name": album.name,
+                "artist_id": album.artist_id
+            }
+            response_data.append(data)
+        return response_data
+    
+    def post(self):
+        if not request.is_json:
+            return "Request content type must be JSON", 415
+        # Check that request includes fields "name" and "artist_id" with correct type
+        try:
+            name = request.json["name"]
+            artist_id = int(request.json["artist_id"])
+        except KeyError:
+            return "Incomplete request - missing fields", 400
+        except ValueError:
+            return "artist_id must be an integer", 400
+        # Check that artist_id matches an artist in the database
+        if not Artist.query.filter_by(id=artist_id).first():
+            return "artist_id does not match any artist", 400
+        # Check that the album by this artist does not exist in database
+        if Album.query.filter_by(name=name, artist_id=artist_id).first():
+            return f"Album {name} by artist_id {artist_id} already exists", 400
+        # Create new album
+        new_album = Album(
+            name=name,
+            artist_id=artist_id
+        )
+        # Add the new album to the database
+        try:
+            db.session.add(new_album)
+            db.session.commit()
+        except IntegrityError:
+            # This should not get called because neither album.name nor
+            # album.artist_id has to be unique
+            return "Failed to add album to database", 409
+        return f"Album {name} created successfully", 201
+
+class AlbumItem(Resource):
+
+    def get(self, id):
+        album = Album.query.get(id)
+        if not album:
+            return "Album not found", 404
+        album_data = {
+            "name": album.name,
+            "artist_id": album.artist_id
+        }
+        return album_data
+
+    def put(self, id):
+        album = Album.query.get(id)
+        if not album:
+            return "Album not found", 404
+        if not request.is_json:
+            return "Request content type must be JSON", 415
+        try:
+            name = request.json["name"]
+            artist_id = int(request.json["artist_id"])
+        except KeyError:
+            return "Incomplete request - missing fields", 400
+        except ValueError:
+            return "artist_id must be an integer", 400
+        # Check that artist_id matches an artist in the database
+        if not Artist.query.filter_by(id=artist_id).first():
+            return "artist_id does not match any artist", 400
+        # Check for changes
+        if (name == album.name) and (artist_id == album.artist_id):
+        #if Album.query.filter_by(name=name, artist_id=artist_id).first(): #alternative
+            return f"No changes detected", 400   
+        # Update album info
+        album.name = name
+        album.artist_id = artist_id
+        db.session.commit()
+        return f"Album {name} updated successfully", 200
+
+    def delete(self, id):
+        album = Album.query.get(id)
+        if not album:
+            return "Album not found", 400
+        db.session.delete(album)
+        db.session.commit()
+        return f"Album {album.name} deleted successfully", 200
+
