@@ -1,3 +1,10 @@
+import os
+import sys
+
+
+app_dir = os.path.join(os.path.dirname(__file__), "../app")
+sys.path.insert(0, app_dir)
+os.chdir(app_dir)
 from database import db, app, Artist, Album, Track, User, Playlist
 
 with app.app_context():
