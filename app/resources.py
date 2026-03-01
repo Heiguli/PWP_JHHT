@@ -46,7 +46,7 @@ class ArtistItem(Resource):
     def get(self, id):
         artist = Artist.query.get(id)
         if not artist:
-            return {"message", "Artist not found"}, 404
+            return {"message": "Artist not found"}, 404
         artist_data = {
             "name": artist.name
         }
@@ -260,3 +260,89 @@ class AlbumItem(Resource):
         db.session.commit()
         return f"Album {album.name} deleted successfully", 200
 
+class UserCollection(Resource):
+    def get(self):
+        userList = []
+        allUsers = User.query.all()
+        for user in allUsers:
+            userData = {
+                "id": user.id,
+                "name": user.name
+            }
+            userList.append(userData)
+        return userList
+
+    def post(self):
+        if not request.is_json:
+            return {"message": "Request content type must be JSON"}, 415
+        incomingData = request.json
+        requiredFields = ["name"]
+        if not all(field in incomingData for field in requiredFields):
+            return {"message": "Incomplete request - missing fields"}, 400
+        try:
+            userName = incomingData["name"]
+        except (ValueError, TypeError):
+            return {"message": "Invalid data types for fields"}, 400
+        newUser = User(name=userName)
+        db.session.add(newUser)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return {"message": "Database integrity error - possible duplicate entry"}, 400
+        return {"message": f"User {userName} created successfully!"}, 201
+
+    def delete(self): #Dont use if not EXPLICITLY needed, because this deletes ALL users
+        numDeleted = User.query.delete()
+        db.session.commit()
+        return {"message": f"Deleted {numDeleted} users"}, 200
+
+
+class UserItem(Resource):
+
+    def get(self, id):
+        user = User.query.get(id)
+        if not user:
+            return {"message": "User not found"}, 404
+        # also show the playlists this user has
+        playlistList = []
+        for playlist in user.playlists:
+            playlistList.append({
+                "id": playlist.id,
+                "name": playlist.name
+            })
+        userData = {
+            "id": user.id,
+            "name": user.name,
+            "playlists": playlistList
+        }
+        return userData
+
+    def put(self, id):
+        user = User.query.get(id)
+        if not user:
+            return {"message": "User not found"}, 404
+        if not request.is_json:
+            return {"message": "Request content type must be JSON"}, 415
+        incomingData = request.json
+        requiredFields = ["name"]
+        if not all(field in incomingData for field in requiredFields):
+            return {"message": "Incomplete request - missing fields"}, 400
+        try:
+            user.name = incomingData["name"]
+        except (ValueError, TypeError):
+            return {"message": "Invalid data types for fields"}, 400
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return {"message": "Database integrity error - possible duplicate entry"}, 400
+        return {"message": f"User {user.name} updated successfully!"}, 200
+
+    def delete(self, id):
+        user = User.query.get(id)
+        if not user:
+            return {"message": "User not found"}, 404
+        db.session.delete(user)
+        db.session.commit()
+        return {"message": f"User {user.name} deleted successfully"}, 200
