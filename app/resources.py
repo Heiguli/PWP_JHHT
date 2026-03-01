@@ -346,3 +346,138 @@ class UserItem(Resource):
         db.session.delete(user)
         db.session.commit()
         return {"message": f"User {user.name} deleted successfully"}, 200
+
+# got the idea from other resource classes and adapted it to fit the playlist model
+class PlaylistCollection(Resource):
+
+    def get(self):
+        playlistList = []
+        allPlaylists = Playlist.query.all()
+        for playlist in allPlaylists:
+            playlistData = {
+                "id": playlist.id,
+                "name": playlist.name,
+                "description": playlist.description
+            }
+            playlistList.append(playlistData)
+        return playlistList
+
+    def post(self):
+        if not request.is_json:
+            return {"message": "Request content type must be JSON"}, 415
+        incomingData = request.json
+        requiredFields = ["name"]
+        if not all(field in incomingData for field in requiredFields):
+            return {"message": "Incomplete request - missing fields"}, 400
+        try:
+            playlistName = incomingData["name"]
+            playlistDesc = incomingData.get("description", "") # description is optional
+        except (ValueError, TypeError):
+            return {"message": "Invalid data types for fields"}, 400
+        newPlaylist = Playlist(name=playlistName, description=playlistDesc)
+        # if user_id is given, link the playlist to that user
+        if "user_id" in incomingData:
+            try:
+                userId = int(incomingData["user_id"])
+            except (ValueError, TypeError):
+                return {"message": "user_id must be an integer"}, 400
+            foundUser = User.query.get(userId)
+            if not foundUser:
+                return {"message": "User not found"}, 404
+            newPlaylist.users.append(foundUser)
+        db.session.add(newPlaylist)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return {"message": "Database integrity error"}, 400
+        return {"message": f"Playlist {playlistName} created successfully!"}, 201
+
+    def delete(self): #Dont use if not EXPLICITLY needed, because this deletes ALL playlists
+        numDeleted = Playlist.query.delete()
+        db.session.commit()
+        return {"message": f"Deleted {numDeleted} playlists"}, 200
+
+
+class PlaylistItem(Resource):
+
+    def get(self, id):
+        playlist = Playlist.query.get(id)
+        if not playlist:
+            return {"message": "Playlist not found"}, 404
+        # show which tracks are on this playlist
+        trackList = []
+        for track in playlist.tracks:
+            trackList.append({
+                "id": track.id,
+                "name": track.name,
+                "length": track.length
+            })
+        # show which users own this playlist
+        userList = []
+        for user in playlist.users:
+            userList.append({
+                "id": user.id,
+                "name": user.name
+            })
+        playlistData = {
+            "id": playlist.id,
+            "name": playlist.name,
+            "description": playlist.description,
+            "tracks": trackList,
+            "users": userList
+        }
+        return playlistData
+
+    def put(self, id):
+        playlist = Playlist.query.get(id)
+        if not playlist:
+            return {"message": "Playlist not found"}, 404
+        if not request.is_json:
+            return {"message": "Request content type must be JSON"}, 415
+        incomingData = request.json
+        requiredFields = ["name"]
+        if not all(field in incomingData for field in requiredFields):
+            return {"message": "Incomplete request - missing fields"}, 400
+        try:
+            playlist.name = incomingData["name"]
+            playlist.description = incomingData.get("description", playlist.description)
+        except (ValueError, TypeError):
+            return {"message": "Invalid data types for fields"}, 400
+        # if track_id is given, add that track to the playlist
+        if "track_id" in incomingData:
+            try:
+                trackId = int(incomingData["track_id"])
+            except (ValueError, TypeError):
+                return {"message": "track_id must be an integer"}, 400
+            foundTrack = Track.query.get(trackId)
+            if not foundTrack:
+                return {"message": "Track not found"}, 404
+            if foundTrack not in playlist.tracks:
+                playlist.tracks.append(foundTrack)
+        # if user_id is given, link that user to the playlist
+        if "user_id" in incomingData:
+            try:
+                userId = int(incomingData["user_id"])
+            except (ValueError, TypeError):
+                return {"message": "user_id must be an integer"}, 400
+            foundUser = User.query.get(userId)
+            if not foundUser:
+                return {"message": "User not found"}, 404
+            if foundUser not in playlist.users:
+                playlist.users.append(foundUser)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return {"message": "Database integrity error"}, 400
+        return {"message": f"Playlist {playlist.name} updated successfully!"}, 200
+
+    def delete(self, id):
+        playlist = Playlist.query.get(id)
+        if not playlist:
+            return {"message": "Playlist not found"}, 404
+        db.session.delete(playlist)
+        db.session.commit()
+        return {"message": f"Playlist {playlist.name} deleted successfully"}, 200
+
