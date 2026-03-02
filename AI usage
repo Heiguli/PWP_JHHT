@@ -1,8 +1,8 @@
-Use of AI Tools
+In this project we, the team members, used AI the following ways:
 
-This project was developed with assistance from ChatGPT (OpenAI). AI was used for:
+Mainly ChatGPT was used, which is free, and it fits the allowed AI usage of the course. Team members used AI for: 
 
-Clarifying Flask-RESTful architecture
+Clarifying API related questions like questions related to Flask-RESTful architecture
 
 Understanding REST principles (uniform interface, statelessness, addressability)
 
@@ -10,7 +10,7 @@ Refactoring project structure into multiple files
 
 Explaining error messages and debugging issues
 
-All code was reviewed and modified by the author to ensure understanding and correctness.
+All code was reviewed and modified by the team members to ensure understanding and correctness.
 
 Prompts used were mainly conceptual questions about:
 
