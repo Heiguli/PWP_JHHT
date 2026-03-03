@@ -1,3 +1,6 @@
+"""
+This module contains the initialization of the application and also the registration of API resources.
+"""
 from flask_restful import Api
 from flask import jsonify
 from database import app, db
@@ -44,4 +47,5 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     print("App is running!")
+
     app.run(debug=True)
