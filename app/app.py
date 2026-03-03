@@ -24,6 +24,11 @@ api.add_resource(PlaylistItem, "/playlists/<int:id>")
 
 @app.route("/")
 def Index():
+    """
+    Root endpoint of the Beatify API.
+
+    Returns general information about the API.
+    """
     return jsonify({
         "api_name": "Beatify Music API",
         "version": "v1",
@@ -49,3 +54,4 @@ if __name__ == "__main__":
     print("App is running!")
 
     app.run(debug=True)
+
