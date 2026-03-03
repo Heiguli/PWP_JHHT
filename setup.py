@@ -1,3 +1,12 @@
+"""
+This module contains the setup logic for the API and the database it uses
+and automates it by:
+- installing required dependencies
+- creating the database
+- populating the database
+- and starting the flask application
+"""
+
 import subprocess
 import sys
 import os
