@@ -51,43 +51,43 @@ Represents a playlist that can contain tracks and be shared between users.
 
 ### Artist
 
-```TODO: Add description```
+```Represents a Artist resource object which tracks individual artists and which tracks and albums belong to which artists.```
 
 | Endpoint | Method | Description |
 |---|---|---|
-| `/artists` | GET | |
-| `/artists` | POST | |
-| `/artists` | DELETE | |
-| `/artists/<id>` | GET | |
-| `/artists/<id>` | PUT | |
-| `/artists/<id>` | DELETE | |
+| `/artists` | GET |Get ALL artists |
+| `/artists` | POST |Create a singular artist |
+| `/artists` | DELETE |Delete ALL artists (should not be used, risky) |
+| `/artists/<id>` | GET |Get singular artist |
+| `/artists/<id>` | PUT |Update a artist |
+| `/artists/<id>` | DELETE |Delete singular artist |
 
 ---
 
 ### Album
 
-```TODO: Add description```
+```Represents a Album resource object which tracks individual albums and which tracks belong to which albums. Also to whom (artist) the album belongs to.```
 
 | Endpoint | Method | Description |
 |---|---|---|
-| `/albums` | GET | |
-| `/albums` | POST | |
-| `/albums` | DELETE | |
-| `/albums/<id>` | GET | |
-| `/albums/<id>` | PUT | |
-| `/albums/<id>` | DELETE | |
+| `/albums` | GET |Get ALL albums |
+| `/albums` | POST |Create singular album |
+| `/albums` | DELETE |Delete ALL albums (should not be used, risky) |
+| `/albums/<id>` | GET |Get singular album |
+| `/albums/<id>` | PUT |Update singular album |
+| `/albums/<id>` | DELETE |Delete singular album |
 
 ---
 
 ### Track
 
-```TODO: Add description ```
+```Represents a Track resource object which tracks indidual tracks and to whom (artist) they belong to and to which album they belong to.  ```
 
 | Endpoint | Method | Description |
 |---|---|---|
-| `/tracks` | GET | |
-| `/tracks` | POST | |
-| `/tracks` | DELETE | |
-| `/tracks/<id>` | GET | |
-| `/tracks/<id>` | PUT | |
-| `/tracks/<id>` | DELETE | |
+| `/tracks` | GET |Get ALL tracks |
+| `/tracks` | POST |Create singular track |
+| `/tracks` | DELETE |Delete ALL tracks (should not be used, risky) |
+| `/tracks/<id>` | GET |Get singular track |
+| `/tracks/<id>` | PUT |Update singular track |
+| `/tracks/<id>` | DELETE |Delete singular track |
