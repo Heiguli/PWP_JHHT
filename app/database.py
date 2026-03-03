@@ -1,7 +1,17 @@
-from flask import Flask  #import Flask, which allows us to get the core functionalities behind building a web app
-from flask_sqlalchemy import SQLAlchemy #import SQLAlchemy because it allows us to easily do databases via python classes
+"""
+This module contains the database logic for the API beatify. 
+Resources included:
+- Artist
+- Album
+- Track
+- Playlist
+- User
+"""
+
+from flask import Flask  #Core Flask web framework
+from flask_sqlalchemy import SQLAlchemy #We use SQLAlchemy because it allows us to easily do databases via python classes
 from sqlalchemy.engine import Engine #Needed to check for example, connections,
-from sqlalchemy import event #and then we can listen for a event, like connection event via engine, and then we run a function after connection event
+from sqlalchemy import event #and then we can listen for a event, like connection event via engine, and then we run a function after the said event
 
 app = Flask(__name__) #Creates Flask application object, and tells flask that the application is located in app.py
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db" #Tells flask to which database to connect to, and store database in file called "test.db"
