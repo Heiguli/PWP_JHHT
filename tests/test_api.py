@@ -1,4 +1,8 @@
-# Note a lot of help is taken from AI to complete these tests, but I have adapted and edited them to fit the actual implementation of the API. I have also added some extra test cases that I thought were necessary to cover more edge cases and ensure the robustness of the API.
+"""
+This module contains automated tests for the API to make sure its foundation is working correctly.
+"""
+# Note: a lot of help is taken from AI to complete these tests, but I have adapted and edited them to fit the actual implementation of the API. 
+# I have also added some extra test cases that I thought were necessary to cover more edge cases and ensure the robustness of the API.
 
 import pytest
 import json
