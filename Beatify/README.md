@@ -2,11 +2,12 @@
 
 This module contains the core application code for the Beatify Music API, a RESTful API for managing artists, albums, tracks, users and playlists.
 
-## Files
+## Current Package Structure
 
-- **app.py** - Main entry point. Sets up Flask RESTful routes and runs the server.
-- **database.py** - Database models and SQLAlchemy configuration.
-- **resources.py** - Resource classes that handle HTTP requests for each endpoint.
+- **api.py** - API registration, root endpoint, and startup function.
+- **models.py** - Flask app and SQLAlchemy models/configuration.
+- **utils.py** - Shared helpers for root payload and JSON responses.
+- **resources/** - Split resource modules (`artists.py`, `albums.py`, `tracks.py`, `users.py`, `playlists.py`).
 
 ## Base URL
 
@@ -51,28 +52,27 @@ Represents a playlist that can contain tracks and be shared between users.
 
 ### Artist
 
-```Represents a Artist resource object which tracks individual artists and which tracks and albums belong to which artists.```
+Represents artists and their related albums.
 
 | Endpoint | Method | Description |
 |---|---|---|
 | `/artists` | GET |Get ALL artists |
 | `/artists` | POST |Create a singular artist |
-| `/artists` | DELETE |Delete ALL artists (should not be used, risky) |
+| `/artists` | DELETE |Delete all artists |
 | `/artists/<id>` | GET |Get singular artist |
-| `/artists/<id>` | PUT |Update a artist |
+| `/artists/<id>` | PUT |Update an artist |
 | `/artists/<id>` | DELETE |Delete singular artist |
 
 ---
 
 ### Album
 
-```Represents a Album resource object which tracks individual albums and which tracks belong to which albums. Also to whom (artist) the album belongs to.```
+Represents albums and their relation to artists.
 
 | Endpoint | Method | Description |
 |---|---|---|
 | `/albums` | GET |Get ALL albums |
 | `/albums` | POST |Create singular album |
-| `/albums` | DELETE |Delete ALL albums (should not be used, risky) |
 | `/albums/<id>` | GET |Get singular album |
 | `/albums/<id>` | PUT |Update singular album |
 | `/albums/<id>` | DELETE |Delete singular album |
@@ -81,13 +81,13 @@ Represents a playlist that can contain tracks and be shared between users.
 
 ### Track
 
-```Represents a Track resource object which tracks indidual tracks and to whom (artist) they belong to and to which album they belong to.  ```
+Represents tracks and their relation to albums.
 
 | Endpoint | Method | Description |
 |---|---|---|
 | `/tracks` | GET |Get ALL tracks |
 | `/tracks` | POST |Create singular track |
-| `/tracks` | DELETE |Delete ALL tracks (should not be used, risky) |
+| `/tracks` | DELETE |Delete all tracks |
 | `/tracks/<id>` | GET |Get singular track |
 | `/tracks/<id>` | PUT |Update singular track |
 | `/tracks/<id>` | DELETE |Delete singular track |

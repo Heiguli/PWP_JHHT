@@ -25,20 +25,20 @@ pip install flask flask-restful flask-sqlalchemy pytest pytest-cov
 
 Or install from the requirements file:
 
+`setup.py` can install requirements and start the API automatically.
+If you want to do everything manually:
+
 ```bash
-The Automated scripted is provided setup.py which will automatically install requirements and UP the api,
-if you wants to do it manually follow the following
 pip install -r Database_folder/requirements.txt
 pip install flask-restful pytest pytest-cov
 ```
 
 ## Running the Tests
 
-Navigate to the `app/` folder and run pytest:
+From project root run:
 
 ```bash
-cd tests
-python -m tests/api_test.py -v
+python -m pytest tests/api_test.py -v
 ```
 
 The `-v` flag gives verbose output showing each test name and result.
@@ -48,8 +48,7 @@ The `-v` flag gives verbose output showing each test name and result.
 To see how much of the code is covered by tests:
 
 ```bash
-cd tests
-python -m tests/api_test.py -v --cov=. --cov-report=term-missing
+python -m pytest tests/api_test.py -v --cov=Beatify --cov-report=term-missing
 ```
 
 This will show:
@@ -61,10 +60,10 @@ This will show:
 
 | Command | What it does |
 |---|---|
-| `python -m tests/api_test.py` | Run all tests |
-| `python -m tests/api_test.py -v` | Run tests with detailed output |
-| `python -m tests/api_test.py -v --cov=.` | Run tests + show coverage % |
-| `python -m tests/api_test.py -v --cov=. --cov-report=term-missing` | Run tests + show which lines are missing |
-| `python -m tests/api_test.py -k "Artist"` | Run only Artist tests |
-| `python -m tests/api_test.py -k "User"` | Run only User tests |
-| `python -m tests/api_test.py -k "Playlist"` | Run only Playlist tests |
+| `python -m pytest tests/api_test.py` | Run API tests |
+| `python -m pytest tests/api_test.py -v` | Run API tests with detailed output |
+| `python -m pytest tests/api_test.py --cov=Beatify` | Run API tests + show coverage % |
+| `python -m pytest tests/api_test.py --cov=Beatify --cov-report=term-missing` | Run API tests + show missing lines |
+| `python -m pytest tests/api_test.py -k "Artist"` | Run only Artist tests |
+| `python -m pytest tests/api_test.py -k "User"` | Run only User tests |
+| `python -m pytest tests/api_test.py -k "Playlist"` | Run only Playlist tests |
