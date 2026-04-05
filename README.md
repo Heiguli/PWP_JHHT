@@ -7,9 +7,68 @@
 * Student 4. Teemu Kettukangas, teemu.kettukangas@student.oulu.fi
 
 
+# Run Beatify API (Current Structure)
+
+Run all commands from the project root folder.
+
+## 1) Install dependencies
+
+```bash
+pip install -r Database_folder/requirements.txt
+pip install flask-restful pytest pytest-cov
+```
+
+## 2) Create and populate database
+
+```bash
+python setup.py
+```
+
+This script installs requirements (if missing), creates tables, populates sample data, and starts the API.
+
+If you want to run manually without setup script:
+
+```bash
+python Database_folder/populate_DB.py
+```
+
+## 3) Start API manually
+
+```bash
+python -m Beatify.api
+```
+
+API base URL:
+
+```text
+http://localhost:5000/Beatify/api/v1
+```
+
+
+# Run Tests (Current Structure)
+
+Run from project root:
+
+```bash
+python -m pytest tests/api_test.py -v
+```
+
+Run all tests:
+
+```bash
+python -m pytest -v
+```
+
+Run with coverage:
+
+```bash
+python -m pytest tests/api_test.py -v --cov=Beatify --cov-report=term-missing
+```
+
+
 # How to setup the API Beatify with the setup.py file
 
-Setting up the API with the setup.py file is super easy and straightforwarded. The file automatically installs required dependencies, creates the database, populates it and starts the flask application.  All you need to do, to access and run this setup.py file, is to:
+Setting up the API with the setup.py file is super easy and straight forwarded. The file automatically installs required dependencies, creates the database, populates it and starts the flask application.  All you need to do, to access and run this setup.py file, is to:
 - navigate to the correct folder where setup.py is located,
 - then run python setup.py, this is easily done from CMD
 

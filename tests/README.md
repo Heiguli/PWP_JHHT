@@ -38,7 +38,7 @@ Navigate to the `app/` folder and run pytest:
 
 ```bash
 cd tests
-python -m pytest test_api.py -v
+python -m tests/api_test.py -v
 ```
 
 The `-v` flag gives verbose output showing each test name and result.
@@ -49,7 +49,7 @@ To see how much of the code is covered by tests:
 
 ```bash
 cd tests
-python -m pytest test_api.py -v --cov=. --cov-report=term-missing
+python -m tests/api_test.py -v --cov=. --cov-report=term-missing
 ```
 
 This will show:
@@ -61,10 +61,10 @@ This will show:
 
 | Command | What it does |
 |---|---|
-| `python -m pytest test_api.py` | Run all tests |
-| `python -m pytest test_api.py -v` | Run tests with detailed output |
-| `python -m pytest test_api.py -v --cov=.` | Run tests + show coverage % |
-| `python -m pytest test_api.py -v --cov=. --cov-report=term-missing` | Run tests + show which lines are missing |
-| `python -m pytest test_api.py -k "Artist"` | Run only Artist tests |
-| `python -m pytest test_api.py -k "User"` | Run only User tests |
-| `python -m pytest test_api.py -k "Playlist"` | Run only Playlist tests |
+| `python -m tests/api_test.py` | Run all tests |
+| `python -m tests/api_test.py -v` | Run tests with detailed output |
+| `python -m tests/api_test.py -v --cov=.` | Run tests + show coverage % |
+| `python -m tests/api_test.py -v --cov=. --cov-report=term-missing` | Run tests + show which lines are missing |
+| `python -m tests/api_test.py -k "Artist"` | Run only Artist tests |
+| `python -m tests/api_test.py -k "User"` | Run only User tests |
+| `python -m tests/api_test.py -k "Playlist"` | Run only Playlist tests |

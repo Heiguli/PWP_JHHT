@@ -90,6 +90,15 @@ class Playlist(db.Model):   #Database class for Playlist object. Makes Playlist 
 
     def __repr__(self):
         return f"[Playlist {self.name}]"
-    
 
-    
+__all__ = [
+    "app",
+    "db",
+    "playlists_table",
+    "playlists_users_table",
+    "Artist",
+    "Album",
+    "Track",
+    "User",
+    "Playlist",
+]

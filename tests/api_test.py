@@ -7,16 +7,22 @@ This module contains automated tests for the API to make sure its foundation is 
 import pytest
 import json
 import os
+import runpy
 import sys
 import tempfile
+from unittest.mock import Mock
+from sqlalchemy.exc import IntegrityError
 
-app_dir = os.path.join(os.path.dirname(__file__), "../app")
-db_dir = os.path.join(os.path.dirname(__file__), "../Database_folder")
-sys.path.insert(0, app_dir)
-os.chdir(app_dir)
+project_root = os.path.join(os.path.dirname(__file__), "..")
+sys.path.insert(0, project_root)
+os.chdir(project_root)
 
-from database import app, db, Artist, Album, Track, User, Playlist
-import app as main_app
+from Beatify.models import app, db, Artist, Album, Track, User, Playlist
+import Beatify.api as main_app
+from Beatify.resources import artists as artists_resource
+from Beatify.resources import playlists as playlists_resource
+from Beatify.resources import users as users_resource
+from Beatify.utils import build_root_payload, json_response
 
 @pytest.fixture
 def client():
@@ -70,6 +76,178 @@ def PutPlain(client, url, data):
 def PostPlain(client, url, data):
     """Helper to send POST with non-JSON content"""
     return client.post(BASE + url, data=data, content_type="text/plain")
+
+
+class TestApiModule:
+
+    def test_root_index_payload(self, client):
+        """GET / returns API metadata payload"""
+        resp = client.get("/")
+        assert resp.status_code == 200
+        assert resp.get_json()["api_name"] == "Beatify Music API"
+
+    def test_start_api_calls_create_all_and_run(self, monkeypatch):
+        """start_api initializes DB and starts server with debug flag"""
+        create_all_mock = Mock()
+        run_mock = Mock()
+        print_mock = Mock()
+
+        monkeypatch.setattr(main_app.db, "create_all", create_all_mock)
+        monkeypatch.setattr(main_app.app, "run", run_mock)
+        monkeypatch.setattr("builtins.print", print_mock)
+
+        main_app.start_api(debug=False)
+
+        create_all_mock.assert_called_once()
+        run_mock.assert_called_once_with(debug=False)
+        print_mock.assert_called_once_with("App is running!")
+
+    def test_api_main_guard_executes_startup(self, monkeypatch):
+        """Executing Beatify.api as __main__ triggers start_api(debug=True)."""
+        create_all_mock = Mock()
+        run_mock = Mock()
+        print_mock = Mock()
+
+        monkeypatch.setattr("flask_restful.Api.add_resource", lambda *args, **kwargs: None)
+        monkeypatch.setattr("Beatify.models.app.route", lambda *args, **kwargs: (lambda func: func))
+        monkeypatch.setattr("Beatify.models.db.create_all", create_all_mock)
+        monkeypatch.setattr("Beatify.models.app.run", run_mock)
+        monkeypatch.setattr("builtins.print", print_mock)
+
+        runpy.run_module("Beatify.api", run_name="__main__")
+
+        create_all_mock.assert_called_once()
+        run_mock.assert_called_once_with(debug=True)
+        print_mock.assert_called_once_with("App is running!")
+
+
+class _BadMap:
+    """Map-like object that passes membership checks but fails key access."""
+
+    def __contains__(self, key):
+        return True
+
+    def __getitem__(self, key):
+        raise TypeError("bad access")
+
+    def get(self, key, default=None):
+        raise TypeError("bad access")
+
+
+class _DummyRequest:
+    def __init__(self, payload):
+        self.is_json = True
+        self.json = payload
+
+
+class TestCoverageBranches:
+
+    def test_models_repr_lines(self):
+        assert repr(Artist(name="A")) == "[Artist A]"
+        assert repr(Album(name="B", artist_id=1)) == "[Album B]"
+        assert repr(Track(name="C", length=120, album_id=1)) == "[Track C]"
+        assert repr(User(name="D")) == "[User D]"
+        assert repr(Playlist(name="E")) == "[Playlist E]"
+
+    def test_artist_post_invalid_type_branch(self, monkeypatch):
+        monkeypatch.setattr(artists_resource, "request", _DummyRequest(_BadMap()))
+        body, code = artists_resource.ArtistCollection().post()
+        assert code == 400
+        assert body["message"] == "Invalid data types for fields"
+
+    def test_artist_put_invalid_type_branch(self, monkeypatch, client):
+        with app.app_context():
+            db.session.add(Artist(name="ArtistX"))
+            db.session.commit()
+
+        monkeypatch.setattr(artists_resource, "request", _DummyRequest(_BadMap()))
+        body, code = artists_resource.ArtistItem().put(1)
+        assert code == 400
+        assert body["message"] == "Invalid data types for fields"
+
+    def test_user_post_invalid_type_branch(self, monkeypatch):
+        monkeypatch.setattr(users_resource, "request", _DummyRequest(_BadMap()))
+        body, code = users_resource.UserCollection().post()
+        assert code == 400
+        assert body["message"] == "Invalid data types for fields"
+
+    def test_user_put_invalid_type_branch(self, monkeypatch, client):
+        with app.app_context():
+            db.session.add(User(name="UserX"))
+            db.session.commit()
+
+        monkeypatch.setattr(users_resource, "request", _DummyRequest(_BadMap()))
+        body, code = users_resource.UserItem().put(1)
+        assert code == 400
+        assert body["message"] == "Invalid data types for fields"
+
+    def test_playlist_post_invalid_type_branch(self, monkeypatch, client):
+        monkeypatch.setattr(playlists_resource, "request", _DummyRequest(_BadMap()))
+        body, code = playlists_resource.PlaylistCollection().post()
+        assert code == 400
+        assert body["message"] == "Invalid data types for fields"
+
+    def test_playlist_post_integrity_error_branch(self, monkeypatch, client):
+        original_commit = db.session.commit
+        original_rollback = db.session.rollback
+        rollback_mock = Mock()
+
+        def _raise_commit():
+            raise IntegrityError("stmt", "params", Exception("boom"))
+
+        monkeypatch.setattr(playlists_resource, "request", _DummyRequest({"name": "List1"}))
+        monkeypatch.setattr(db.session, "commit", _raise_commit)
+        monkeypatch.setattr(db.session, "rollback", rollback_mock)
+
+        body, code = playlists_resource.PlaylistCollection().post()
+        assert code == 400
+        assert body["message"] == "Database integrity error"
+        rollback_mock.assert_called_once()
+
+        monkeypatch.setattr(db.session, "commit", original_commit)
+        monkeypatch.setattr(db.session, "rollback", original_rollback)
+
+    def test_playlist_put_invalid_type_branch(self, monkeypatch, client):
+        with app.app_context():
+            db.session.add(Playlist(name="List2"))
+            db.session.commit()
+
+        monkeypatch.setattr(playlists_resource, "request", _DummyRequest(_BadMap()))
+        body, code = playlists_resource.PlaylistItem().put(1)
+        assert code == 400
+        assert body["message"] == "Invalid data types for fields"
+
+    def test_playlist_put_integrity_error_branch(self, monkeypatch, client):
+        with app.app_context():
+            db.session.add(Playlist(name="List3"))
+            db.session.commit()
+
+        original_commit = db.session.commit
+        original_rollback = db.session.rollback
+        rollback_mock = Mock()
+
+        def _raise_commit():
+            raise IntegrityError("stmt", "params", Exception("boom"))
+
+        monkeypatch.setattr(playlists_resource, "request", _DummyRequest({"name": "Renamed"}))
+        monkeypatch.setattr(db.session, "commit", _raise_commit)
+        monkeypatch.setattr(db.session, "rollback", rollback_mock)
+
+        body, code = playlists_resource.PlaylistItem().put(1)
+        assert code == 400
+        assert body["message"] == "Database integrity error"
+        rollback_mock.assert_called_once()
+
+        monkeypatch.setattr(db.session, "commit", original_commit)
+        monkeypatch.setattr(db.session, "rollback", original_rollback)
+
+    def test_utils_functions_covered(self):
+        payload = build_root_payload("http://example.test/Beatify/api/v1")
+        assert payload["endpoints"]["Artists"].endswith("/artists")
+
+        with app.app_context():
+            response = json_response({"ok": True})
+        assert response.get_json() == {"ok": True}
 
 
 # --------------------------------------------------------------------------

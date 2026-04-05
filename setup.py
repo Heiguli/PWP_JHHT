@@ -21,15 +21,15 @@ def install_requirements():
 
 def create_and_populate_db():
     """Create database tables and populate with sample data."""
-    app_dir = os.path.join(os.path.dirname(__file__), "app")
+    app_dir = os.path.dirname(__file__)
     db_dir = os.path.join(os.path.dirname(__file__), "Database_folder")
     sys.path.insert(0, app_dir)
-    os.chdir(app_dir)
 
-    from database import db, app
+    from Beatify.models import db, app
 
     print("Creating database...")
     with app.app_context():
+        db.drop_all()
         db.create_all()
     print("Database created successfully.\n")
 
@@ -41,9 +41,9 @@ def create_and_populate_db():
 
 def start_app():
     """Start the Flask application."""
-    app_dir = os.path.join(os.path.dirname(__file__), "app")
+    app_dir = os.path.dirname(__file__)
     print("=== Starting application ===")
-    subprocess.call([sys.executable, os.path.join(app_dir, "app.py")])
+    subprocess.call([sys.executable, "-m", "Beatify.api"], cwd=app_dir)
 
 if __name__ == "__main__":
     install_requirements()
