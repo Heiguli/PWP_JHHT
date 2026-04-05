@@ -66,7 +66,7 @@ python -m pytest tests/api_test.py -v --cov=Beatify --cov-report=term-missing
 - Test guide: [tests/README.md](tests/README.md)
 - Schema folder notes: [Beatify/static/schema/README.md](Beatify/static/schema/README.md)
 
-## Docker Deployment (Quick)
+## Docker Deployment (Quick) #TODO
 
 Build and run local production-style stack:
 
