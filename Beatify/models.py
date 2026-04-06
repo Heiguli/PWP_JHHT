@@ -48,7 +48,7 @@ playlists_users_table = db.Table("playlists_users",
 # Whenever SQLAlchemy creates a new database connection using an Engine, run the function below
 @event.listens_for(Engine, "connect")
 # SQLite has foreign keys off by default, so we need this function to turn them on after connection
-def set_sqlite_pragma(dbapi_connection):
+def set_sqlite_pragma(dbapi_connection, connection_record):
     """
     SQLite has foreign keys off by default, so we need this function to turn them on
     after connection.
