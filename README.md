@@ -68,7 +68,7 @@ python -m pytest tests/api_test.py -v --cov=Beatify --cov-report=term-missing
 - Deployment guide: [DEPLOYMENT.md](DEPLOYMENT.md)
 
 
-## Docker Deployment (Quick) #TODO
+## Docker Deployment (Quick)
 
 Build and run local production-style stack:
 
