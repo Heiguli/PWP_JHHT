@@ -4,7 +4,6 @@ from pathlib import Path
 
 from flask import render_template_string, send_file
 from flask_restful import Api
-from flasgger import Swagger
 
 from .models import app
 from .resources import (
