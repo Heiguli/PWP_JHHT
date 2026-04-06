@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:5000
     description: Local development server
-  - url: https://your-cloud-domain.example.com
+  - url: http://130.162240.153:5000
     description: Public cloud deployment example
 
 tags:
