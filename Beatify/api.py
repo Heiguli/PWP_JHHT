@@ -38,7 +38,7 @@ api.add_resource(PlaylistItem, "/playlists/<int:id>")
 @app.route("/")
 def index():
     """Root endpoint with usage information."""
-    return json_response(build_root_payload())
+    return json_response(build_root_payload("http://130.162.240.153:5000/Beatify/api/v1"))
 
 
 @app.route("/openapi.yaml")
