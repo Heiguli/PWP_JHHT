@@ -20,7 +20,7 @@ def build_root_payload(base_url: str = "http://localhost:5000/Beatify/api/v1") -
             "Tracks": f"{base_url}/tracks",
             "Users": f"{base_url}/users",
             "Playlists": f"{base_url}/playlists",
-            "Docs": f"{base_url}/Beatify/api/v1/docs,
+            "Docs": f"{base_url}/Beatify/api/v1/docs",
         },
         "single_item": "Add /<id> to any endpoint above, e.g. /Beatify/api/v1/artists/1",
     }
