@@ -15,6 +15,11 @@ This module contains the core application code for the Beatify Music API, a REST
 /Beatify/api/v1
 ```
 
+## API Docs Endpoints
+
+- Swagger UI: `/Beatify/api/v1/docs`
+- OpenAPI YAML: `/Beatify/api/v1/openapi.yaml`
+
 ## Resources
 
 ### User

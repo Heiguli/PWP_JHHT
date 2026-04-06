@@ -24,6 +24,11 @@ If you only want to (re)populate the database without running `setup.py`, run:
 python Database_folder/populate_DB.py
 ```
 
+## Docker Behavior
+
+When using `docker compose up --build`, the app container can seed sample data automatically on startup via `POPULATE_DB=true`.
+The startup script only seeds when the database is empty, so regular restarts do not duplicate records.
+
 ## Virtual Environment (Optional but Recommended)
 
 Create venv:

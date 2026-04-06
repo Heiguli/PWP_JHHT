@@ -1,6 +1,6 @@
 """Reusable utility helpers for API modules and tests."""
 
-from flask import jsonify
+from flask import current_app
 
 
 def build_root_payload(base_url: str = "http://localhost:5000/Beatify/api/v1") -> dict:
@@ -27,4 +27,5 @@ def build_root_payload(base_url: str = "http://localhost:5000/Beatify/api/v1") -
 
 def json_response(payload: dict):
     """Return Flask JSON response with a dict payload."""
-    return jsonify(payload)
+    pretty_json = current_app.json.dumps(payload, indent=2) + "\n"
+    return current_app.response_class(pretty_json, mimetype="application/json")

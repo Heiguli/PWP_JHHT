@@ -1,5 +1,8 @@
 """API registration in the Beatify module layout."""
 
+from pathlib import Path
+
+from flask import render_template_string, send_file
 from flask_restful import Api
 
 from .models import app
@@ -36,6 +39,49 @@ api.add_resource(PlaylistItem, "/playlists/<int:id>")
 def index():
     """Root endpoint with usage information."""
     return json_response(build_root_payload())
+
+
+@app.route("/openapi.yaml")
+@app.route("/Beatify/api/v1/openapi.yaml")
+def openapi_spec():
+    """Serve the OpenAPI YAML document."""
+    spec_path = Path(__file__).resolve().parent.parent / "docs" / "openapi.yaml"
+    return send_file(spec_path, mimetype="application/yaml")
+
+
+SWAGGER_UI_TEMPLATE = """<!doctype html>
+<html lang=\"en\">
+    <head>
+        <meta charset=\"utf-8\" />
+        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+        <title>Beatify API Docs</title>
+        <link rel=\"stylesheet\" href=\"https://unpkg.com/swagger-ui-dist@5/swagger-ui.css\" />
+        <style>
+            body { margin: 0; background: #f5f7fb; }
+            #swagger-ui { max-width: 1200px; margin: 0 auto; }
+        </style>
+    </head>
+    <body>
+        <div id=\"swagger-ui\"></div>
+        <script src=\"https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js\"></script>
+        <script>
+            window.ui = SwaggerUIBundle({
+                url: '{{ spec_url }}',
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [SwaggerUIBundle.presets.apis],
+            });
+        </script>
+    </body>
+</html>
+"""
+
+
+@app.route("/docs")
+@app.route("/Beatify/api/v1/docs")
+def swagger_docs():
+        """Render interactive Swagger UI for the OpenAPI spec."""
+        return render_template_string(SWAGGER_UI_TEMPLATE, spec_url="/Beatify/api/v1/openapi.yaml")
 
 
 def start_api(debug: bool = True):

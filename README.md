@@ -65,6 +65,8 @@ python -m pytest tests/api_test.py -v --cov=Beatify --cov-report=term-missing
 - Database notes and setup details: [Database_folder/README.md](Database_folder/README.md)
 - Test guide: [tests/README.md](tests/README.md)
 - Schema folder notes: [Beatify/static/schema/README.md](Beatify/static/schema/README.md)
+- Deployment guide: [DEPLOYMENT.md](DEPLOYMENT.md)
+
 
 ## Docker Deployment (Quick) #TODO
 
@@ -74,16 +76,20 @@ Build and run local production-style stack:
 docker compose up --build
 ```
 
+Docker setup now seeds sample data on first startup by default.
+
 Then open:
 
 ```text
-http://localhost:8080/Beatify/api/v1
+http://localhost:5000/Beatify/api/v1/artists
+http://localhost:5000/Beatify/api/v1/docs
+http://localhost:5000/Beatify/api/v1/openapi.yaml
 ```
 
 GitHub Actions workflow for CI/CD is in:
 
 ```text
-.github/workflows/ci-cd.yml
+.github/workflows/python-app.yml
 ```
 
 Validate OpenAPI locally:
@@ -91,6 +97,8 @@ Validate OpenAPI locally:
 ```bash
 python -m openapi_spec_validator docs/openapi.yaml
 ```
+
+Note: `/Beatify/api/v1` itself is not a standalone route in this API; use one of the resource or docs routes above.
 
 ## Notes
 
