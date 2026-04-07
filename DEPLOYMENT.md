@@ -109,6 +109,74 @@ Minimum production settings to configure on your host platform:
   - `POPULATE_DB=true|false`
     - Current default in Compose is `POPULATE_DB=true` (seeds sample data on first startup)
 
+## Oracle Cloud VM Deployment (Current Production)
+The API was deployed on Oracle Cloud Free Tier.
+Public URL: http://130.162.240.153:5000/ , public IP: 130.162.240.153
+
+## VM setup Via Oracle Cloud
+1. Create Oracle Cloud account at cloud.oracle.com
+   - Home region should be Frankfurt (If deploying from Finland)
+   - Credit card information is used for just verification, no actual fees when using free account, just a small checkup that is returned if I understood correctly
+3. Configure VCN (Virtual Cloud network)
+   - Top left 3 horizontal lines -> Networking -> Virtual cloud networks
+   - Create VCN
+   - You can name it
+   - IPv4 CIDR Blocks -> 10.0.0.0/16
+   - Other settings default
+   - Create VCN
+4. Open port in Oracle Cloud
+   - Go to VCN -> Click the VCN you created -> Security tab -> Default Security List for "name of VCN"
+   - -> Security rules tab -> Ingress Rules -> Add Ingress Rules -> Source CIDR 0.0.0.0/0, TCP, Destination port Range: 5000, other settings default -> Add Ingress Rules,
+   - At the same time check that there is a ingress rule for TCP, Destination Port Range 22, Source 0.0.0.0/0, if not, create it as you did previously with port 5000
+4. Configure VCN Subnets
+   - Click the created VCN
+   - Go to subnet section
+   - Create subnet
+   - You can name it
+   - IPv4 CIDR Block -> 10.0.1.0/24
+   - Subnet Access -> Public Subnet
+   - Everything else default
+5. Create an Internet Gateway
+   - Go to your created VCN page -> Gateways tab
+   - Internet gateways -> Create Internet Gateway
+   - Name it, everything else default -> Create Internet Gateway
+6. Add a route table
+   - In the same VCN, which you created, go to Routing tab
+   - Default Route Table for "the name of the VCM" -> Go to Route Rules tab
+   - Add Route Rules -> Target type: Internet Gateway, Destination CIDR: 0.0.0.0/0, Target Internet Gateway: select the igw you created previously, other settings default
+5. Create Compute Instance
+   - Top left 3 horizontal lines -> Compute -> Instances
+   - Create instance
+   - You can name your instance
+   - Image and shape -> Change image to Canonical Ubuntu 22.04
+   - Other settings default in basic information
+   - Security -> Default settings
+   - Networking -> Primary VNIC -> You can name it
+   - Subnet -> Select existing subnet -> Subnet should be the subnet you created previously
+   - SSH Keys -> Generate a key pair for me -> download private and public key, store these in your local drive
+   - Other settings in networking default
+   - Storage settings default
+   - Review and create the instance
+6. Things needed from the VM
+   - Public IP is found in the VM that you created
+
+## API deployment via cmd
+1. Open terminal, for example, cmd and launch VM
+    - Use command -> ssh -i /path/to/your/private-key.key ubuntu@YOUR_PUBLIC_IP or ssh -i \path\to\private-key.key ubuntu@YOUR_PUBLIC_IP
+    - If admin/permission issues do -> icacls C:\ssh_for_beatify\ssh-key-2026-04-06.key /inheritance:r , then icacls C:\ssh_for_beatify\ssh-key-2026-04-06.key /grant:r "%USERNAME%:R"
+    - If still problems, do -> ssh -v -i /path/to/your/private-key.key ubuntu@YOUR_PUBLIC_IP
+2. Update the VM system
+    - run command sudo apt update && sudo apt upgrade -y
+    - if new kernel available, just default settings and press ok (enter)
+3. Install Docker
+    - sudo apt install -y docker.io docker-compose
+4. Clone your repository from github
+    - git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME.git
+    - move to your repository file in VM -> cd YOUR_REPO_NAME
+    - Repo name can be easily accessed via command ls
+5. Open port in Ubuntu firewall -> Run command sudo iptables -I INPUT -p tcp --dport 5000 -j ACCEPT
+6. And then to build and run docker compose -> Run command sudo docker-compose up --build -d
+7. When you want to stop the dockers, do -> Run command sudo docker-compose down
 ## Documentation and API Criteria Checklist Support
 
 This deployment setup directly supports criteria for:
