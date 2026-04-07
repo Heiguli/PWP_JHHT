@@ -182,8 +182,8 @@ Public URL: http://130.162.240.153:5000/ , public IP: 130.162.240.153
     - Should return Beatify API info JSON
 8. When you want to stop the dockers, do -> Run command sudo docker-compose down
 
-## HHTPS
-This deploymenty uses HTTP only, because the HTTPS is outside the scope of this project.
+## HTTPS
+This deployment uses HTTP only, because the HTTPS is outside the scope of this project.
 
 ## Updating the VM
 Remember to update the VM if github changes are made - sudo docker-compose down, git pull, sudo docker-compose up --build -d
