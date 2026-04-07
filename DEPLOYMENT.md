@@ -176,7 +176,18 @@ Public URL: http://130.162.240.153:5000/ , public IP: 130.162.240.153
     - Repo name can be easily accessed via command ls
 5. Open port in Ubuntu firewall -> Run command sudo iptables -I INPUT -p tcp --dport 5000 -j ACCEPT
 6. And then to build and run docker compose -> Run command sudo docker-compose up --build -d
-7. When you want to stop the dockers, do -> Run command sudo docker-compose down
+7. Verify deployment is working
+    - curl http://YOUR_PUBLIC_IP:5000/
+    - Or open in browser: http://130.162.240.153:5000/
+    - Should return Beatify API info JSON
+8. When you want to stop the dockers, do -> Run command sudo docker-compose down
+
+## HHTPS
+This deploymenty uses HTTP only, because the HTTPS is outside the scope of this project.
+
+## Updating the VM
+Remember to update the VM if github changes are made - sudo docker-compose down, git pull, sudo docker-compose up --build -d
+
 ## Documentation and API Criteria Checklist Support
 
 This deployment setup directly supports criteria for:
