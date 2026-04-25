@@ -12,7 +12,7 @@ class ArtistCollection(Resource):
 		artist_list = []
 		artists = Artist.query.all()
 		for artist in artists:
-			artist_list.append({"name": artist.name})
+			artist_list.append({"name": artist.name, "id": artist.id})
 		return artist_list
 
 	def post(self):
@@ -46,7 +46,7 @@ class ArtistItem(Resource):
 		artist = Artist.query.get(id)
 		if not artist:
 			return {"message": "Artist not found"}, 404
-		return {"name": artist.name}
+		return {"name": artist.name, "id": artist.id}
 
 	def put(self, id):
 		artist = Artist.query.get(id)
