@@ -66,6 +66,7 @@ python -m pytest tests/api_test.py -v --cov=Beatify --cov-report=term-missing
 - Test guide: [tests/README.md](tests/README.md)
 - Schema folder notes: [Beatify/static/schema/README.md](Beatify/static/schema/README.md)
 - Deployment guide: [DEPLOYMENT.md](DEPLOYMENT.md)
+- API Auxiliary service: [API_Client_Auxiliary_service/auxiliary_service/README.md](API_Client_Auxiliary_service/auxiliary_service/README.md)
 
 
 ## Docker Deployment (Quick)
@@ -89,7 +90,7 @@ http://localhost:5000/Beatify/api/v1/openapi.yaml
 GitHub Actions workflow for CI/CD is in:
 
 ```text
-.github/workflows/python-app.yml
+.github/workflows/ci-cd.yml
 ```
 
 Validate OpenAPI locally:
