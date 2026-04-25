@@ -11,7 +11,7 @@ class AlbumCollection(Resource):
 		response_data = []
 		albums = Album.query.all()
 		for album in albums:
-			response_data.append({"name": album.name, "artist_id": album.artist_id})
+			response_data.append({"name": album.name, "artist_id": album.artist_id, "id":album.id})
 		return response_data
 
 	def post(self):
@@ -41,7 +41,7 @@ class AlbumItem(Resource):
 		album = Album.query.get(id)
 		if not album:
 			return {"message": "Album not found"}, 404
-		return {"name": album.name, "artist_id": album.artist_id}
+		return {"name": album.name, "artist_id": album.artist_id, "id":album.id}
 
 	def put(self, id):
 		album = Album.query.get(id)
