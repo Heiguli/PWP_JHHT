@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from time import time
 from typing import Any
 
 import requests
@@ -8,6 +9,11 @@ from flask import Flask, jsonify
 
 BASE_URL = "http://130.162.240.153:5000/Beatify/api/v1"
 TIMEOUT = 10
+MAX_ID_PROBE = 250
+PROBE_GAP_BREAK = 12
+CACHE_TTL_SECONDS = 60
+
+_LIST_ID_CACHE: dict[str, tuple[float, list[dict[str, Any]]]] = {}
 
 app = Flask(__name__)
 
@@ -31,6 +37,56 @@ def _fetch_list(path: str) -> tuple[bool, list[dict[str, Any]]]:
     if not (200 <= status < 300 and isinstance(data, list)):
         return False, []
     return True, data
+
+
+def _fetch_list_with_ids(path: str) -> tuple[bool, list[dict[str, Any]]]:
+    cached = _LIST_ID_CACHE.get(path)
+    if cached and time() - cached[0] < CACHE_TTL_SECONDS:
+        return True, cached[1]
+
+    ok, rows = _fetch_list(path)
+    if not ok:
+        return False, []
+    if not rows:
+        return True, []
+
+    if all(isinstance(row, dict) and "id" in row for row in rows):
+        _LIST_ID_CACHE[path] = (time(), rows)
+        return True, rows
+
+    expected_count = len(rows)
+    resolved: list[dict[str, Any]] = []
+    misses_in_a_row = 0
+
+    for item_id in range(1, MAX_ID_PROBE + 1):
+        status, item = _get(f"{path}/{item_id}")
+        if 200 <= status < 300 and isinstance(item, dict):
+            resolved.append({"id": item_id, **item})
+            misses_in_a_row = 0
+        elif status == 404:
+            misses_in_a_row += 1
+            if resolved and len(resolved) >= expected_count and misses_in_a_row >= PROBE_GAP_BREAK:
+                break
+        else:
+            break
+
+    if resolved:
+        _LIST_ID_CACHE[path] = (time(), resolved)
+        return True, resolved
+
+    return True, rows
+
+
+def _resolve_artist_name(artist_id: int, artist_rows: list[dict[str, Any]]) -> str:
+    for artist in artist_rows:
+        if artist.get("id") == artist_id:
+            return str(artist.get("name", "Unknown"))
+
+    status, artist_item = _get(f"/artists/{artist_id}")
+    if 200 <= status < 300 and isinstance(artist_item, dict):
+        return str(artist_item.get("name", f"Artist #{artist_id}"))
+
+    return f"Artist #{artist_id}"
 
 
 @app.get("/")
@@ -82,7 +138,7 @@ def summary() -> Any:
 
 @app.get("/analytics/top-artists")
 def top_artists() -> Any:
-    ok_albums, albums = _fetch_list("/albums")
+    ok_albums, albums = _fetch_list_with_ids("/albums")
     ok_tracks, tracks = _fetch_list("/tracks")
     ok_artists, artists = _fetch_list("/artists")
 
@@ -101,11 +157,10 @@ def top_artists() -> Any:
         if artist_id is not None:
             artist_counter[artist_id] += 1
 
-    artist_name = {a.get("id"): a.get("name", "Unknown") for a in artists}
     top_items = [
         {
             "artist_id": artist_id,
-            "artist_name": artist_name.get(artist_id, "Unknown"),
+            "artist_name": _resolve_artist_name(artist_id, artists),
             "track_count": count,
         }
         for artist_id, count in artist_counter.most_common(5)
@@ -127,6 +182,7 @@ def recommendations(user_id: int) -> Any:
         return jsonify({"message": "Unable to fetch tracks from Beatify API"}), 503
 
     playlist_track_ids: set[int] = set()
+    playlist_track_signatures: set[tuple[str, int]] = set()
     for playlist in user_data.get("playlists", []):
         playlist_id = playlist.get("id")
         if playlist_id is None:
@@ -137,14 +193,30 @@ def recommendations(user_id: int) -> Any:
                 track_id = track.get("id")
                 if isinstance(track_id, int):
                     playlist_track_ids.add(track_id)
+                name = track.get("name")
+                length = track.get("length")
+                if isinstance(name, str) and isinstance(length, int):
+                    playlist_track_signatures.add((name, length))
+
+    tracks_have_ids = all(isinstance(track, dict) and "id" in track for track in tracks)
 
     candidates = [
         t
         for t in tracks
-        if isinstance(t.get("id"), int)
-        and t["id"] not in playlist_track_ids
-        and isinstance(t.get("length"), int)
+        if isinstance(t.get("length"), int)
         and t["length"] >= 180
+        and (
+            (
+                tracks_have_ids
+                and isinstance(t.get("id"), int)
+                and t["id"] not in playlist_track_ids
+            )
+            or (
+                not tracks_have_ids
+                and isinstance(t.get("name"), str)
+                and (t["name"], t["length"]) not in playlist_track_signatures
+            )
+        )
     ]
 
     candidates = sorted(candidates, key=lambda item: item["length"], reverse=True)[:5]
