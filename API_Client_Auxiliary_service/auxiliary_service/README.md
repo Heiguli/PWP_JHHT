@@ -38,7 +38,7 @@ This separation keeps the core API focused on canonical data operations while al
 ## Install and Run
 
 ```bash
-cd deadline5/auxiliary_service
+cd API_Client_Auxiliary_service/auxiliary_service
 pip install -r requirements.txt
 python service.py
 ```
