@@ -12,7 +12,7 @@ class TrackCollection(Resource):
 		track_list = []
 		tracks = Track.query.all()
 		for track in tracks:
-			track_list.append({"name": track.name, "length": track.length, "album_id": track.album_id})
+			track_list.append({"name": track.name, "length": track.length, "album_id": track.album_id, "id": track.id})
 		return track_list
 
 	def post(self):
@@ -52,7 +52,7 @@ class TrackItem(Resource):
 		track = Track.query.get(id)
 		if not track:
 			return {"message": "Track not found"}, 404
-		return {"name": track.name, "length": track.length, "album_id": track.album_id}
+		return {"name": track.name, "length": track.length, "album_id": track.album_id, "id": track.id}
 
 	def put(self, id):
 		track = Track.query.get(id)
