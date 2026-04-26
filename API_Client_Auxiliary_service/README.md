@@ -38,5 +38,5 @@ Service base URL:
 
 Component documentation:
 
-- [PWP_JHHT_CLIENT/README.md](PWP_JHHT_CLIENT/README.md)
+- [PWP_JHHT_CLIENT/README.md](https://github.com/Heiguli/PWP_JHHT_CLIENT/blob/main/README.md)
 - [auxiliary_service/README.md](auxiliary_service/README.md)
