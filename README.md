@@ -12,6 +12,21 @@
 
 Run all commands from project root.
 
+### 0) Clone repository with submodules
+
+`PWP_JHHT_CLIENT` is a submodule, so clone recursively:
+
+```bash
+git clone https://github.com/Heiguli/PWP_JHHT.git --recursive 
+cd PWP_JHHT
+```
+
+If you already cloned without submodules, run:
+
+```bash
+git submodule update --init --recursive
+```
+
 ### 1) Install dependencies
 
 ```bash
