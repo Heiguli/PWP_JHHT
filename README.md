@@ -66,6 +66,7 @@ python -m pytest tests/api_test.py -v --cov=Beatify --cov-report=term-missing
 - Test guide: [tests/README.md](tests/README.md)
 - Schema folder notes: [Beatify/static/schema/README.md](Beatify/static/schema/README.md)
 - Deployment guide: [DEPLOYMENT.md](DEPLOYMENT.md)
+- API client docs: [API_Client_Auxiliary_service/PWP_JHHT_CLIENT/README.md](API_Client_Auxiliary_service/PWP_JHHT_CLIENT/README.md)
 - API Auxiliary service: [API_Client_Auxiliary_service/auxiliary_service/README.md](API_Client_Auxiliary_service/auxiliary_service/README.md)
 
 
