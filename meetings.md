@@ -72,8 +72,8 @@
 
 
 ## Final meeting
-* **DATE:**
-* **PARTICIPANTS:**
+* **DATE:2026-05-15**
+* **PARTICIPANTS:Ivan Sanchez Milara**
 * **TEACHER:**
 
 ### Minutes
