@@ -122,3 +122,9 @@ Note: `/Beatify/api/v1` itself is not a standalone route in this API; use one of
 - The old `app/` package docs are no longer used. Current code lives in the `Beatify/` package.
 - If you change folder structure, update imports and scripts (`setup.py`, tests, and DB scripts) accordingly.
 
+# BackUp EndPoints for DEMo
+```text
+API: https://jhtt-api.onrender.com/
+CLIENT: https://jhttwebclient.onrender.com/
+AUX: https://jhttclient.onrender.com/
+```
